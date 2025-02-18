@@ -1,72 +1,43 @@
-const audioElementCrash = new Audio("sounds/crash.mp3");
-const audioElementKB = new Audio("sounds/kick-bass.mp3");
-const audioElementSnare = new Audio("sounds/snare.mp3");
-const audioElementTOne = new Audio("sounds/tom-1.mp3");
-const audioElementTTwo = new Audio("sounds/tom-2.mp3");
-const audioElementTThree = new Audio("sounds/tom-3.mp3");
-const audioElementTFour = new Audio("sounds/tom-4.mp3");
+const audioElements = {
+    "a": new Audio("sounds/kick-bass.mp3"),
+    "s": new Audio("sounds/snare.mp3"),
+    "d": new Audio("sounds/tom-1.mp3"),
+    "f": new Audio("sounds/crash.mp3"),
+    "j": new Audio("sounds/tom-2.mp3"),
+    "k": new Audio("sounds/tom-3.mp3"),
+    "l": new Audio("sounds/tom-4.mp3"),
+};
+
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.addEventListener("click", handleClick);
+    document.addEventListener("click", handleEvent);
+    document.addEventListener("keydown", handleEvent);
 });
 
-document.addEventListener("keydown", (keyDown) => {
-    const selectedButton = keyDown.key;
-    const activeElement = document.querySelector(`.${selectedButton}`);
-    if (activeElement) {
-        activeElement.style.color = "green";
-        handleEvents(activeElement);
-    }
-});
-
-function paintButtonRed(audioElement, audioButton) {
-    audioElement.addEventListener("ended", () => {
-        audioButton.style.color = "midnightblue";
-    });
-}
-
-function handleClick(e) {
-    if (e.target.tagName === "BUTTON" && e.target.classList.contains("drum")) {
-        e.target.style.color = "green";
-        handleEvents(e.target);
+function handleEvent(e) {
+    if (e.type === "click" && e.target.tagName === "BUTTON" && e.target.classList.contains("drum")) {
+        makeSound(e.target, e.target.innerText.toLowerCase());
+    } else if (e.type === "keydown") {
+        const key = e.key.toLowerCase();
+        if (key && audioElements[key]) {
+            const button = document.querySelector(`.${key}`);
+            if (button) {
+                makeSound(button, key);
+            }
+        }
     }
 }
 
-function handleEvents(keyOrMouseEvent) {
-    const e = keyOrMouseEvent.innerText.toLowerCase() ? keyOrMouseEvent.innerText.toLowerCase() : keyOrMouseEvent.key;
-    switch (e) {
-        case "a":
-            audioElementKB.play();
-            paintButtonRed(audioElementKB, keyOrMouseEvent);
-            break;
-        case "s":
-            audioElementSnare.play();
-            paintButtonRed(audioElementSnare, keyOrMouseEvent);
-            break;
-        case "d":
-            audioElementTOne.play();
-            paintButtonRed(audioElementTOne, keyOrMouseEvent);
-            break;
-        case "f":
-            audioElementCrash.play();
-            paintButtonRed(audioElementCrash, keyOrMouseEvent);
-            break;
-        case "j":
-            audioElementTTwo.play();
-            paintButtonRed(audioElementTTwo, keyOrMouseEvent);
-            break;
-        case "k":
-            audioElementTThree.play();
-            paintButtonRed(audioElementTThree, keyOrMouseEvent);
-            break;
-        case "l":
-            audioElementTFour.play();
-            paintButtonRed(audioElementTFour, keyOrMouseEvent);
-            break;
-        default:
-            console.log(this);
-    }
 
+function makeSound(button, key) {
+    const audioElement = audioElements[key];
+    if (audioElement) {
+        button.classList.add("pressed");
+        audioElement.play();
+        audioElement.addEventListener("ended", () => {
+            button.classList.remove("pressed");
+        });
+    }
 }
 
 
